@@ -94,6 +94,7 @@ async function onModeCompleted() {
     await window.api.addSession({
       focusMinutes,
       breakMinutes,
+      sessionType: 'focus',
       note: getPreparedNote(),
     });
 
@@ -105,10 +106,18 @@ async function onModeCompleted() {
     setNoteLockState(false);
     await renderHistory();
   } else {
+    await window.api.addSession({
+      focusMinutes,
+      breakMinutes,
+      sessionType: 'break',
+      note: '',
+    });
+
     // Break bitince focus moduna dön.
     isFocusMode = true;
     totalSeconds = focusMinutes * 60;
     remainingSeconds = totalSeconds;
+    await renderHistory();
   }
 
   stopTimer();
@@ -203,6 +212,22 @@ function escapeHtml(text) {
     .replace(/'/g, '&#39;');
 }
 
+function getSessionMeta(sessionType) {
+  if (sessionType === 'break') {
+    return {
+      label: 'Break',
+      icon: 'cloud',
+      className: 'history-tag break',
+    };
+  }
+
+  return {
+    label: 'Focus',
+    icon: 'leaf',
+    className: 'history-tag focus',
+  };
+}
+
 async function renderHistory() {
   const sessions = await window.api.getSessions();
 
@@ -213,12 +238,18 @@ async function renderHistory() {
 
   historyList.innerHTML = sessions
     .map((s) => {
+      const sessionType = s.session_type || 'focus';
+      const meta = getSessionMeta(sessionType);
       const noteHtml = s.note ? `<div class="history-note">Not: ${escapeHtml(s.note)}</div>` : '';
       return `
         <article class="history-item">
           <div class="history-main">
             <strong>${formatDate(s.created_at)}</strong>
-            <span>Focus ${s.focus_minutes} dk | Mola ${s.break_minutes} dk</span>
+            <span>${meta.label} | Focus ${s.focus_minutes} dk | Mola ${s.break_minutes} dk</span>
+          </div>
+          <div class="${meta.className}">
+            <span class="history-icon">${meta.icon}</span>
+            <span>${meta.label} Session</span>
           </div>
           ${noteHtml}
         </article>

@@ -388,6 +388,32 @@ button.ghost {
   opacity: 0.9;
 }
 
+.history-tag {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.history-tag.focus {
+  background: #dff1c6;
+  color: #2e6f36;
+}
+
+.history-tag.break {
+  background: #d7ecf7;
+  color: #2f5f88;
+}
+
+.history-icon {
+  font-size: 13px;
+  letter-spacing: 0.3px;
+}
+
 .empty {
   background: #fff6d6;
   border-radius: 12px;

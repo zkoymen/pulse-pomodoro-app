@@ -15,9 +15,18 @@ function initDatabase() {
         created_at TEXT NOT NULL,
         focus_minutes INTEGER NOT NULL,
         break_minutes INTEGER NOT NULL,
+        session_type TEXT NOT NULL DEFAULT 'focus',
         note TEXT DEFAULT ''
       )
     `);
+
+    db.all('PRAGMA table_info(sessions)', [], (err, columns) => {
+      if (err || !columns) return;
+      const hasSessionType = columns.some((col) => col.name === 'session_type');
+      if (!hasSessionType) {
+        db.run("ALTER TABLE sessions ADD COLUMN session_type TEXT NOT NULL DEFAULT 'focus'");
+      }
+    });
   });
 }
 
@@ -49,13 +58,13 @@ app.whenReady().then(() => {
 });
 
 ipcMain.handle('history:addSession', async (_, payload) => {
-  const { focusMinutes, breakMinutes, note } = payload;
+  const { focusMinutes, breakMinutes, note, sessionType } = payload;
   const now = new Date().toISOString();
 
   return new Promise((resolve, reject) => {
     db.run(
-      'INSERT INTO sessions (created_at, focus_minutes, break_minutes, note) VALUES (?, ?, ?, ?)',
-      [now, focusMinutes, breakMinutes, (note || '').trim()],
+      'INSERT INTO sessions (created_at, focus_minutes, break_minutes, session_type, note) VALUES (?, ?, ?, ?, ?)',
+      [now, focusMinutes, breakMinutes, sessionType || 'focus', (note || '').trim()],
       function onInsert(err) {
         if (err) return reject(err);
         resolve({ id: this.lastID });
@@ -67,7 +76,7 @@ ipcMain.handle('history:addSession', async (_, payload) => {
 ipcMain.handle('history:getSessions', async () => {
   return new Promise((resolve, reject) => {
     db.all(
-      'SELECT id, created_at, focus_minutes, break_minutes, note FROM sessions ORDER BY id DESC',
+      'SELECT id, created_at, focus_minutes, break_minutes, session_type, note FROM sessions ORDER BY id DESC',
       [],
       (err, rows) => {
         if (err) return reject(err);
