@@ -16,6 +16,8 @@ const startPauseBtn = document.getElementById('start-pause');
 const resetBtn = document.getElementById('reset-btn');
 const progressBar = document.getElementById('progress-bar');
 const noteInput = document.getElementById('note-input');
+const noteEditBtn = document.getElementById('note-edit-btn');
+const noteStatus = document.getElementById('note-status');
 
 const historyList = document.getElementById('history-list');
 const refreshHistoryBtn = document.getElementById('refresh-history');
@@ -28,6 +30,7 @@ let focusMinutes = 25;
 let breakMinutes = 5;
 let totalSeconds = focusMinutes * 60;
 let remainingSeconds = totalSeconds;
+let noteLocked = false;
 
 function clamp(val, min, max) {
   return Math.max(min, Math.min(max, val));
@@ -72,12 +75,25 @@ function stopTimer() {
   startPauseBtn.textContent = 'Başlat';
 }
 
+function setNoteLockState(locked) {
+  noteLocked = locked;
+  noteInput.readOnly = locked;
+  noteEditBtn.disabled = !locked;
+  noteStatus.textContent = locked
+    ? 'Not kaydedildi. Duzenlemek icin Edit tikla.'
+    : 'Enter ile notu tamamla.';
+}
+
+function getPreparedNote() {
+  return (noteInput.value || '').trim();
+}
+
 async function onModeCompleted() {
   if (isFocusMode) {
     await window.api.addSession({
       focusMinutes,
       breakMinutes,
-      note: noteInput.value,
+      note: getPreparedNote(),
     });
 
     // Focus bitince break moduna geç.
@@ -85,6 +101,7 @@ async function onModeCompleted() {
     totalSeconds = breakMinutes * 60;
     remainingSeconds = totalSeconds;
     noteInput.value = '';
+    setNoteLockState(false);
     await renderHistory();
   } else {
     // Break bitince focus moduna dön.
@@ -148,6 +165,20 @@ resetBtn.addEventListener('click', () => {
   stopTimer();
   isFocusMode = true;
   resetCurrentMode();
+  setNoteLockState(false);
+});
+
+noteInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    setNoteLockState(true);
+    noteInput.blur();
+  }
+});
+
+noteEditBtn.addEventListener('click', () => {
+  setNoteLockState(false);
+  noteInput.focus();
 });
 
 function formatDate(iso) {
@@ -210,4 +241,5 @@ tabHistory.addEventListener('click', () => switchTab(true));
 refreshHistoryBtn.addEventListener('click', renderHistory);
 
 resetCurrentMode();
+setNoteLockState(false);
 renderHistory();

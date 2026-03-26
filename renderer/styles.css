@@ -280,6 +280,33 @@ button.ghost {
   padding: 9px;
 }
 
+.note-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.note-edit {
+  min-width: 72px;
+  padding: 9px 10px;
+}
+
+.note-edit[disabled] {
+  opacity: 0.6;
+  cursor: default;
+}
+
+#note-input[readonly] {
+  background: #f2edcf;
+  border-color: #cbbf8a;
+}
+
+.note-status {
+  margin: 6px 0 0;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
 .small {
   margin: 10px 0 0;
   font-size: 13px;
