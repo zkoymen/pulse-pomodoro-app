@@ -1,8 +1,64 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, screen } = require('electron');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
 let db;
+let isMiniMode = false;
+let previousBounds = null;
+
+function getMainWindow() {
+  return BrowserWindow.getAllWindows()[0] || null;
+}
+
+function broadcastMiniMode(win, value) {
+  if (!win || win.isDestroyed()) return;
+  win.webContents.send('window:mini-mode-changed', value);
+}
+
+function enterMiniMode(win) {
+  if (!win || win.isDestroyed() || isMiniMode) return;
+
+  previousBounds = win.getBounds();
+  const workArea = screen.getPrimaryDisplay().workArea;
+  const miniWidth = 275;
+  const miniHeight = 170;
+
+  win.setAlwaysOnTop(true, 'floating');
+  win.setResizable(false);
+  win.setBounds({
+    x: workArea.x + workArea.width - miniWidth - 12,
+    y: workArea.y + 12,
+    width: miniWidth,
+    height: miniHeight,
+  });
+
+  isMiniMode = true;
+  broadcastMiniMode(win, true);
+}
+
+function exitMiniMode(win) {
+  if (!win || win.isDestroyed() || !isMiniMode) return;
+
+  win.setAlwaysOnTop(false);
+  win.setResizable(true);
+
+  if (previousBounds) {
+    win.setBounds(previousBounds);
+  }
+
+  isMiniMode = false;
+  broadcastMiniMode(win, false);
+}
+
+function toggleMiniMode(win) {
+  if (isMiniMode) {
+    exitMiniMode(win);
+  } else {
+    enterMiniMode(win);
+  }
+
+  return isMiniMode;
+}
 
 function initDatabase() {
   const dbPath = path.join(app.getPath('userData'), 'pomodoro_history.db');
@@ -30,12 +86,14 @@ function initDatabase() {
   });
 }
 
+
+// ekran büyüklüğü burası bi bak
 function createWindow() {
   const win = new BrowserWindow({
-    width: 980,
-    height: 680,
-    minWidth: 820,
-    minHeight: 560,
+    width: 740,
+    height: 820,
+    minWidth: 400,
+    minHeight: 500,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -46,6 +104,17 @@ function createWindow() {
 
   win.removeMenu();
   win.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+
+  // Minimize should preserve the current mode exactly.
+  win.on('restore', () => {
+    if (isMiniMode) {
+      win.setAlwaysOnTop(true, 'floating');
+      win.setResizable(false);
+    } else {
+      win.setAlwaysOnTop(false);
+      win.setResizable(true);
+    }
+  });
 }
 
 app.whenReady().then(() => {
@@ -53,9 +122,26 @@ app.whenReady().then(() => {
   createWindow();
 
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+      return;
+    }
+
+    const win = getMainWindow();
+    if (win) {
+      win.show();
+      win.focus();
+    }
   });
 });
+
+ipcMain.handle('window:toggleMiniMode', async () => {
+  const win = BrowserWindow.getFocusedWindow() || getMainWindow();
+  if (!win) return { isMiniMode };
+  return { isMiniMode: toggleMiniMode(win) };
+});
+
+ipcMain.handle('window:getMiniMode', async () => ({ isMiniMode }));
 
 ipcMain.handle('history:addSession', async (_, payload) => {
   const { focusMinutes, breakMinutes, note, sessionType } = payload;

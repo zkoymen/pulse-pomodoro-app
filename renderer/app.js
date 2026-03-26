@@ -13,6 +13,7 @@ const breakPlus = document.getElementById('break-plus');
 const timeDisplay = document.getElementById('time-display');
 const startPauseBtn = document.getElementById('start-pause');
 const resetBtn = document.getElementById('reset-btn');
+const miniModeBtn = document.getElementById('mini-mode-btn');
 const progressBar = document.getElementById('progress-bar');
 const noteInput = document.getElementById('note-input');
 const noteEditBtn = document.getElementById('note-edit-btn');
@@ -32,6 +33,7 @@ let breakMinutes = 5;
 let totalSeconds = focusMinutes * 60;
 let remainingSeconds = totalSeconds;
 let noteLocked = false;
+let isMiniMode = false;
 
 function clamp(val, min, max) {
   return Math.max(min, Math.min(max, val));
@@ -49,6 +51,16 @@ function updateDisplay() {
   const done = totalSeconds - remainingSeconds;
   const ratio = totalSeconds > 0 ? (done / totalSeconds) * 100 : 0;
   progressBar.style.width = `${clamp(ratio, 0, 100)}%`;
+}
+
+function applyMiniModeState(active) {
+  isMiniMode = Boolean(active);
+  document.body.classList.toggle('mini-mode', isMiniMode);
+  miniModeBtn.textContent = isMiniMode ? 'Normal' : 'Mini Mode';
+
+  if (isMiniMode) {
+    switchTab(false);
+  }
 }
 
 function renderModeButtons() {
@@ -176,6 +188,11 @@ resetBtn.addEventListener('click', () => {
   setNoteLockState(false);
 });
 
+miniModeBtn.addEventListener('click', async () => {
+  const result = await window.api.toggleMiniMode();
+  applyMiniModeState(result.isMiniMode);
+});
+
 modeFocusBtn.addEventListener('click', () => setMode(true));
 modeBreakBtn.addEventListener('click', () => setMode(false));
 
@@ -283,7 +300,15 @@ tabTimer.addEventListener('click', () => switchTab(false));
 tabHistory.addEventListener('click', () => switchTab(true));
 refreshHistoryBtn.addEventListener('click', renderHistory);
 
+window.api.onMiniModeChanged((active) => {
+  applyMiniModeState(active);
+});
+
 resetCurrentMode();
 renderModeButtons();
 setNoteLockState(false);
 renderHistory();
+
+window.api.getMiniMode().then((state) => {
+  applyMiniModeState(state.isMiniMode);
+});

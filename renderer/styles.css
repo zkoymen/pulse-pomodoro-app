@@ -83,6 +83,7 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 18px;
+  max-width: 620px;
 }
 
 .hero-card h1 {
@@ -172,19 +173,6 @@ body {
   z-index: 2;
   filter: drop-shadow(0 2px 0 rgba(46, 58, 31, 0.18));
   pointer-events: none;
-}
-
-.pixel-sticker.tomato {
-  left: 14px;
-  top: 14px;
-}
-
-.pixel-sticker.tomato rect:first-child {
-  fill: var(--accent-4);
-}
-
-.pixel-sticker.tomato rect:last-child {
-  fill: #63ba67;
 }
 
 .pixel-sticker.spark {
@@ -320,6 +308,10 @@ body.timer-running .doodle-card {
   display: flex;
   gap: 10px;
   margin-top: 14px;
+}
+
+#mini-mode-btn {
+  margin-left: auto;
 }
 
 button.primary, button.ghost {
@@ -482,7 +474,63 @@ button.ghost {
   font-size: 14px;
 }
 
-@media (max-width: 900px) {
+body.mini-mode .app-shell {
+  grid-template-columns: 1fr;
+}
+
+body.mini-mode .side-nav,
+body.mini-mode .hero-card,
+body.mini-mode .field-row,
+body.mini-mode .mode-switch,
+body.mini-mode .progress-wrap,
+body.mini-mode .note-wrap,
+body.mini-mode .small {
+  display: none;
+}
+
+body.mini-mode .content {
+  padding: 10px;
+}
+
+body.mini-mode .timer-card {
+  max-width: none;
+  padding: 10px;
+  min-height: 0;
+  box-shadow: none;
+  background: linear-gradient(180deg, #f7efc6 0%, #f2dfa3 100%);
+}
+
+body.mini-mode .time-display {
+  margin: 0;
+  font-size: 52px;
+  line-height: 1;
+}
+
+body.mini-mode .controls {
+  margin-top: 6px;
+  gap: 6px;
+  justify-content: center;
+}
+
+body.mini-mode .controls button {
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+body.mini-mode #reset-btn {
+  display: none;
+}
+
+body.mini-mode #mini-mode-btn {
+  margin-left: 0;
+}
+
+body.mini-mode .pixel-sticker.spark,
+body.mini-mode .doodle-card {
+  display: none;
+}
+
+@media (max-width: 700px) {
   .app-shell {
     grid-template-columns: 1fr;
   }
