@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pomodoro</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Manrope:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="side-nav">
+      <div class="logo">Pulse</div>
+      <button id="tab-timer" class="nav-btn active">Timer</button>
+      <button id="tab-history" class="nav-btn">History</button>
+    </aside>
+
+    <main class="content">
+      <section id="timer-page" class="page active">
+        <div class="hero-card">
+          <div>
+            <h1>Pomodoro</h1>
+            <p>Sade, hızlı, kalıcı geçmişli.</p>
+          </div>
+          <div class="dot"></div>
+        </div>
+
+        <div class="timer-card">
+          <div class="field-row">
+            <label>Çalışma (dk)</label>
+            <div class="adjuster">
+              <button id="focus-minus">-</button>
+              <input id="focus-input" type="number" min="1" max="180" value="25" />
+              <button id="focus-plus">+</button>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <label>Mola (dk)</label>
+            <div class="adjuster">
+              <button id="break-minus">-</button>
+              <input id="break-input" type="number" min="1" max="90" value="5" />
+              <button id="break-plus">+</button>
+            </div>
+          </div>
+
+          <div class="mode-pill">
+            Mod: <span id="mode-text">Focus</span>
+          </div>
+
+          <div id="time-display" class="time-display">25:00</div>
+
+          <div class="progress-wrap">
+            <div id="progress-bar" class="progress-bar"></div>
+          </div>
+
+          <div class="controls">
+            <button id="start-pause" class="primary">Başlat</button>
+            <button id="reset-btn" class="ghost">Sıfırla</button>
+          </div>
+
+          <div class="note-wrap">
+            <label for="note-input">Not (opsiyonel)</label>
+            <input id="note-input" type="text" maxlength="120" placeholder="örn. Matematik tekrar" />
+          </div>
+
+          <p class="small">Focus bitince seans geçmişe kaydedilir.</p>
+        </div>
+      </section>
+
+      <section id="history-page" class="page">
+        <div class="history-header">
+          <h2>Geçmiş Seanslar</h2>
+          <button id="refresh-history" class="ghost">Yenile</button>
+        </div>
+        <div id="history-list" class="history-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
