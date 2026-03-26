@@ -10,7 +10,6 @@ const focusPlus = document.getElementById('focus-plus');
 const breakMinus = document.getElementById('break-minus');
 const breakPlus = document.getElementById('break-plus');
 
-const modeText = document.getElementById('mode-text');
 const timeDisplay = document.getElementById('time-display');
 const startPauseBtn = document.getElementById('start-pause');
 const resetBtn = document.getElementById('reset-btn');
@@ -18,6 +17,8 @@ const progressBar = document.getElementById('progress-bar');
 const noteInput = document.getElementById('note-input');
 const noteEditBtn = document.getElementById('note-edit-btn');
 const noteStatus = document.getElementById('note-status');
+const modeFocusBtn = document.getElementById('mode-focus');
+const modeBreakBtn = document.getElementById('mode-break');
 
 const historyList = document.getElementById('history-list');
 const refreshHistoryBtn = document.getElementById('refresh-history');
@@ -48,8 +49,21 @@ function updateDisplay() {
   const done = totalSeconds - remainingSeconds;
   const ratio = totalSeconds > 0 ? (done / totalSeconds) * 100 : 0;
   progressBar.style.width = `${clamp(ratio, 0, 100)}%`;
+}
 
-  modeText.textContent = isFocusMode ? 'Focus' : 'Break';
+function renderModeButtons() {
+  modeFocusBtn.classList.toggle('active', isFocusMode);
+  modeBreakBtn.classList.toggle('active', !isFocusMode);
+}
+
+function setMode(nextIsFocus) {
+  const changed = isFocusMode !== nextIsFocus;
+  if (isRunning && changed) {
+    stopTimer();
+  }
+  isFocusMode = nextIsFocus;
+  resetCurrentMode();
+  renderModeButtons();
 }
 
 function syncFromInputs() {
@@ -90,38 +104,22 @@ function getPreparedNote() {
 }
 
 async function onModeCompleted() {
-  if (isFocusMode) {
-    await window.api.addSession({
-      focusMinutes,
-      breakMinutes,
-      sessionType: 'focus',
-      note: getPreparedNote(),
-    });
+  const sessionType = isFocusMode ? 'focus' : 'break';
+  await window.api.addSession({
+    focusMinutes,
+    breakMinutes,
+    sessionType,
+    note: isFocusMode ? getPreparedNote() : '',
+  });
 
-    // Focus bitince break moduna geç.
-    isFocusMode = false;
-    totalSeconds = breakMinutes * 60;
-    remainingSeconds = totalSeconds;
+  if (isFocusMode) {
     noteInput.value = '';
     setNoteLockState(false);
-    await renderHistory();
-  } else {
-    await window.api.addSession({
-      focusMinutes,
-      breakMinutes,
-      sessionType: 'break',
-      note: '',
-    });
-
-    // Break bitince focus moduna dön.
-    isFocusMode = true;
-    totalSeconds = focusMinutes * 60;
-    remainingSeconds = totalSeconds;
-    await renderHistory();
   }
 
   stopTimer();
-  updateDisplay();
+  resetCurrentMode();
+  await renderHistory();
 }
 
 function tick() {
@@ -174,10 +172,12 @@ startPauseBtn.addEventListener('click', toggleTimer);
 
 resetBtn.addEventListener('click', () => {
   stopTimer();
-  isFocusMode = true;
-  resetCurrentMode();
+  setMode(isFocusMode);
   setNoteLockState(false);
 });
+
+modeFocusBtn.addEventListener('click', () => setMode(true));
+modeBreakBtn.addEventListener('click', () => setMode(false));
 
 noteInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
@@ -274,5 +274,6 @@ tabHistory.addEventListener('click', () => switchTab(true));
 refreshHistoryBtn.addEventListener('click', renderHistory);
 
 resetCurrentMode();
+renderModeButtons();
 setNoteLockState(false);
 renderHistory();
