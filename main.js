@@ -27,6 +27,7 @@ function createWindow() {
     height: 680,
     minWidth: 820,
     minHeight: 560,
+    autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -34,6 +35,7 @@ function createWindow() {
     },
   });
 
+  win.removeMenu();
   win.loadFile(path.join(__dirname, 'renderer', 'index.html'));
 }
 
