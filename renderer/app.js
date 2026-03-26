@@ -72,6 +72,7 @@ function stopTimer() {
     intervalId = null;
   }
   isRunning = false;
+  document.body.classList.remove('timer-running');
   startPauseBtn.textContent = 'Başlat';
 }
 
@@ -126,6 +127,7 @@ function tick() {
 function toggleTimer() {
   if (!isRunning) {
     isRunning = true;
+    document.body.classList.add('timer-running');
     startPauseBtn.textContent = 'Duraklat';
     intervalId = setInterval(tick, 1000);
     return;
