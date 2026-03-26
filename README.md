@@ -1,33 +1,33 @@
 # Pulse Pomodoro
 
-Basit, kompakt ve masaustu bir Pomodoro uygulamasi.
+A simple and compact desktop Pomodoro app.
 
-## Ozellikler
-- Focus ve mola suresi ayarlama (+/- ve sayi girisi)
-- Baslat, duraklat, sifirla
-- Focus bitince seans gecmise kaydedilir
-- Kalici gecmis (SQLite)
-- History sekmesi ile onceki seanslari goruntuleme
+## Features
+- Adjustable focus and break durations (+/- buttons and direct number input)
+- Start, pause, and reset controls
+- Session saved to history when a focus cycle is completed
+- Persistent local history with SQLite
+- History tab to view previous sessions
 
-## Teknoloji
+## Tech Stack
 - Electron
 - SQLite (sqlite3)
 - Vanilla HTML/CSS/JS
 
-## Calistirma
+## Run Locally
 ```bash
 npm install
 npm start
 ```
 
-## EXE Uretme (Windows)
+## Build EXE (Windows)
 ```bash
 $env:CSC_IDENTITY_AUTO_DISCOVERY='false'
 npm run dist
 ```
 
-Cikti dosyasi:
+Output file:
 - dist/Pulse Pomodoro-1.0.0-x64.exe
 
-## Not
-Seans gecmisi uygulama verisi klasorunde tutulur. Uygulama guncellense de gecmis korunur (appId degismedigi surece).
+## Note
+Session history is stored in the app data folder. Updates keep your history as long as the appId stays the same.
