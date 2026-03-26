@@ -86,6 +86,15 @@ ipcMain.handle('history:getSessions', async () => {
   });
 });
 
+ipcMain.handle('history:deleteSession', async (_, id) => {
+  return new Promise((resolve, reject) => {
+    db.run('DELETE FROM sessions WHERE id = ?', [id], function onDelete(err) {
+      if (err) return reject(err);
+      resolve({ changes: this.changes });
+    });
+  });
+});
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });

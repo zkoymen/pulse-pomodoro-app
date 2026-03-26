@@ -216,14 +216,12 @@ function getSessionMeta(sessionType) {
   if (sessionType === 'break') {
     return {
       label: 'Break',
-      icon: 'cloud',
       className: 'history-tag break',
     };
   }
 
   return {
     label: 'Focus',
-    icon: 'leaf',
     className: 'history-tag focus',
   };
 }
@@ -240,16 +238,17 @@ async function renderHistory() {
     .map((s) => {
       const sessionType = s.session_type || 'focus';
       const meta = getSessionMeta(sessionType);
+      const duration = sessionType === 'break' ? s.break_minutes : s.focus_minutes;
       const noteHtml = s.note ? `<div class="history-note">Not: ${escapeHtml(s.note)}</div>` : '';
       return `
         <article class="history-item">
           <div class="history-main">
             <strong>${formatDate(s.created_at)}</strong>
-            <span>${meta.label} | Focus ${s.focus_minutes} dk | Mola ${s.break_minutes} dk</span>
+            <span>${meta.label} | ${duration} dk</span>
           </div>
           <div class="${meta.className}">
-            <span class="history-icon">${meta.icon}</span>
-            <span>${meta.label} Session</span>
+            <span>${meta.label}</span>
+            <button class="history-delete" type="button" data-id="${s.id}" aria-label="Delete session">Delete</button>
           </div>
           ${noteHtml}
         </article>
@@ -257,6 +256,17 @@ async function renderHistory() {
     })
     .join('');
 }
+
+historyList.addEventListener('click', async (event) => {
+  const button = event.target.closest('.history-delete');
+  if (!button) return;
+
+  const sessionId = Number(button.dataset.id);
+  if (!sessionId) return;
+
+  await window.api.deleteSession(sessionId);
+  await renderHistory();
+});
 
 function switchTab(toHistory) {
   tabTimer.classList.toggle('active', !toHistory);
