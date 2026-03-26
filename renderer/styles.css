@@ -2,10 +2,12 @@
   --bg: #eef7dd;
   --panel: #f8f3cf;
   --panel-2: #f4e8b2;
+  --panel-3: #f2e1a3;
   --text: #2e3a1f;
   --accent: #4daf5c;
   --accent-2: #f1bf3f;
   --accent-3: #e57f47;
+  --accent-4: #f0909a;
   --soft: #dfecc4;
 }
 
@@ -74,7 +76,7 @@ body {
 .hero-card {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(120deg, #b7e27a 0%, #f2da6d 100%);
+  background: linear-gradient(120deg, #b7e27a 0%, #f2da6d 65%, #f8c58e 100%);
   border-radius: 16px;
   padding: 18px 20px;
   display: flex;
@@ -146,7 +148,7 @@ body {
 .timer-card {
   position: relative;
   overflow: hidden;
-  background: var(--panel);
+  background: linear-gradient(180deg, var(--panel) 0%, var(--panel-3) 100%);
   border-radius: 16px;
   padding: 18px;
   box-shadow: 0 8px 0 rgba(89, 116, 60, 0.2);
@@ -161,6 +163,39 @@ body {
   border-radius: 50%;
   background: radial-gradient(circle at 25% 25%, rgba(255, 249, 226, 0.9), rgba(77, 175, 92, 0.2));
   border: 2px dashed rgba(46, 58, 31, 0.2);
+}
+
+.pixel-sticker {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  z-index: 2;
+  filter: drop-shadow(0 2px 0 rgba(46, 58, 31, 0.18));
+  pointer-events: none;
+}
+
+.pixel-sticker.tomato {
+  left: 14px;
+  top: 14px;
+}
+
+.pixel-sticker.tomato rect:first-child {
+  fill: var(--accent-4);
+}
+
+.pixel-sticker.tomato rect:last-child {
+  fill: #63ba67;
+}
+
+.pixel-sticker.spark {
+  right: 18px;
+  top: 18px;
+}
+
+.pixel-sticker.spark path {
+  fill: #ffd15d;
+  stroke: #d9991d;
+  stroke-width: 2;
 }
 
 body.timer-running .leaf-doodle {
