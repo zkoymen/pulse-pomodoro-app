@@ -1,6 +1,6 @@
 {
   "name": "timer-app",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Simple desktop pomodoro with persistent history",
   "main": "main.js",
   "scripts": {
