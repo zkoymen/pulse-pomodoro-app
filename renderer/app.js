@@ -180,7 +180,7 @@ modeFocusBtn.addEventListener('click', () => setMode(true));
 modeBreakBtn.addEventListener('click', () => setMode(false));
 
 noteInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter') {
+  if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     setNoteLockState(true);
     noteInput.blur();
